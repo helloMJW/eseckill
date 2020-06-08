@@ -19,5 +19,16 @@ return [
         ]
     ],
     'TEMP_DIR' => null,
-    'LOG_DIR' => null
+    'LOG_DIR' => null,
+    'MYSQL' => [
+        'host'          => '192.168.3.51',
+        'port'          => 3306,
+        'user'          => 'root',
+        'password'      => 'Root@qwe826',
+        'database'      => 'eseckill',
+        'timeout'       => 5,
+        'charset'       => 'utf8mb4',
+        'POOL_MAX_NUM'  => 20,
+        'POOL_TIME_OUT' => 1
+    ]
 ];
