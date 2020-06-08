@@ -6,6 +6,7 @@ namespace App\Model\Seckill;
 
 use EasySwoole\Mysqli\QueryBuilder;
 use EasySwoole\ORM\AbstractModel;
+use EasySwoole\ORM\DbManager;
 
 class MiaoshaGoodsModel extends AbstractModel
 {
@@ -14,8 +15,14 @@ class MiaoshaGoodsModel extends AbstractModel
     protected $primaryKey = 'id';
 
     public function getStock($id) {
-        $result = self::create()->where(['goods_id' => $id])->val('stock_count');
-        return $result;
+
+
+        $result = self::create()->func(function ($builder){
+            $builder->selectForUpdate()->where('goods_id', 2)->getOne($this->tableName);
+        });
+
+//        $result = self::create()->where(['goods_id' => $id])->val('stock_count');
+        return $result [0]['stock_count'];
     }
 
     public function updateStock($id) {

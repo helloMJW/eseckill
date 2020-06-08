@@ -8,6 +8,7 @@ use App\HttpController\Api\ApiBase;
 use App\Model\Seckill\MiaoshaGoodsModel;
 use App\Model\Seckill\MiaoshaOrderModel;
 use App\Model\Shop\OrderInfoModel;
+use EasySwoole\ORM\DbManager;
 
 class Order extends ApiBase
 {
@@ -19,7 +20,13 @@ class Order extends ApiBase
 
         //TODO::验证库存
         $model = new MiaoshaGoodsModel();
+
+//        $model->all();
+//        $lastResult = $model->lastQuery()->getLastQuery();
+
         $stock = $model->getStock($input ['goods_id']);
+
+
         if($stock <= 0) {
             $this->writeJson(0, null, '库存不足');
             return false;
