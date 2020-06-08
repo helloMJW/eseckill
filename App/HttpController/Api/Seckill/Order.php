@@ -24,6 +24,7 @@ class Order extends ApiBase
             $this->writeJson(0, null, '库存不足');
             return false;
         }
+        $model->updateStock($input ['goods_id']);
         //TODO::用户是否已有订单
 
         //TODO::保存订单

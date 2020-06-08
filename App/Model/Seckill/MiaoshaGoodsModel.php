@@ -4,6 +4,7 @@
 namespace App\Model\Seckill;
 
 
+use EasySwoole\Mysqli\QueryBuilder;
 use EasySwoole\ORM\AbstractModel;
 
 class MiaoshaGoodsModel extends AbstractModel
@@ -18,7 +19,7 @@ class MiaoshaGoodsModel extends AbstractModel
     }
 
     public function updateStock($id) {
-        return self::create()->update(['stock_count' => QueryBuilder::dec(1)], ['id' => $id]);
+        return self::create()->update(['stock_count' => QueryBuilder::dec(1)], ['goods_id' => $id]);
     }
 
 }
