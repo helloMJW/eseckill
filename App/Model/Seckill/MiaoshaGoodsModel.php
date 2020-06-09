@@ -19,8 +19,8 @@ class MiaoshaGoodsModel extends AbstractModel
         return $result;
     }
 
-    public function updateStock($id) {
-        return self::create()->update(['stock_count' => QueryBuilder::dec(1)], ['goods_id' => $id]);
+    public function updateStock($id, $stock) {
+        return self::create()->update(['stock_count' => QueryBuilder::dec(1)], ['goods_id' => $id, 'stock_count' => [$stock, '>=']]);
     }
 
 }

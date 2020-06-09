@@ -29,7 +29,7 @@ class Order extends ApiBase
                 throw new Exception('库存不足');
                 return false;
             }
-            $model->updateStock($input ['goods_id']);
+            $model->updateStock($input ['goods_id'], $stock);
             //TODO::用户是否已有订单
 
             //TODO::保存订单
