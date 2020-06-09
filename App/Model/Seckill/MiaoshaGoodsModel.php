@@ -15,14 +15,8 @@ class MiaoshaGoodsModel extends AbstractModel
     protected $primaryKey = 'id';
 
     public function getStock($id) {
-
-
-        $result = self::create()->func(function ($builder){
-            $builder->selectForUpdate()->where('goods_id', 2)->getOne($this->tableName);
-        });
-
-//        $result = self::create()->where(['goods_id' => $id])->val('stock_count');
-        return $result [0]['stock_count'];
+        $result = self::create()->where(['goods_id' => $id])->val('stock_count');
+        return $result;
     }
 
     public function updateStock($id) {
