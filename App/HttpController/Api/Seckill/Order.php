@@ -19,28 +19,34 @@ class Order extends ApiBase
         //TODO::验证活动状态
 
         //TODO::验证库存
+//        $i = 1;
+//        $i++;
 
+        DbManager::getInstance()->startTransaction();
         try{
-            DbManager::getInstance()->startTransaction();
+
             $model = new MiaoshaGoodsModel();
+            $model->updateStock($input ['goods_id']);
+
             $stock = $model->getStock($input ['goods_id']);
-            if($stock <= 0) {
+
+            if($stock < 0) {
                 $this->writeJson(0, null, '库存不足');
-                throw new Exception('库存不足');
+                 throw new \Exception('库存不足');
                 return false;
+            } else {
+
+                //TODO::用户是否已有订单
+                //TODO::保存订单
+                $orderInfoModel = new OrderInfoModel();
+                $miaoshaOrderModel = new MiaoshaOrderModel();
+                $oid = $orderInfoModel->storage($input);
+                $input ['order_id'] = $oid;
+                $miaoshaOrderModel->storage($input);
+                $this->writeJson(1, null, 'ok');
             }
-            $model->updateStock($input ['goods_id'], $stock);
-            //TODO::用户是否已有订单
-
-            //TODO::保存订单
-            $orderInfoModel = new OrderInfoModel();
-            $miaoshaOrderModel = new MiaoshaOrderModel();
-            $oid = $orderInfoModel->storage($input);
-            $input ['order_id'] = $oid;
-            $miaoshaOrderModel->storage($input);
-            $this->writeJson(1, null, 'ok');
-
         } catch (\Throwable  $e) {
+            //var_dump($e->getMessage());
             DbManager::getInstance()->rollback();
         } finally {
             DbManager::getInstance()->commit();
