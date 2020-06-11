@@ -24,6 +24,12 @@ class EasySwooleEvent implements Event
         // TODO: Implement mainServerCreate() method.
         $config = new \EasySwoole\ORM\Db\Config(Config::getInstance()->getConf('MYSQL'));
         DbManager::getInstance()->addConnection(new Connection($config));
+
+        //REDIS
+        $config = new \EasySwoole\Pool\Config();
+        $redisConfig1 = new \EasySwoole\Redis\Config\RedisConfig(\EasySwoole\EasySwoole\Config::getInstance()->getConf('REDIS'));
+        \EasySwoole\Pool\Manager::getInstance()->register(new \App\Pool\RedisPool($config,$redisConfig1),'redis');
+
     }
 
     public static function onRequest(Request $request, Response $response): bool

@@ -30,5 +30,12 @@ return [
         'charset'       => 'utf8mb4',
         'POOL_MAX_NUM'  => 20,
         'POOL_TIME_OUT' => 1
+    ],
+    'REDIS' => [
+        'host'      => 'redis',
+        'port'      => '6379',
+        'auth'      => '',
+        'db'        => null,
+        'serialize' => \EasySwoole\Redis\Config\RedisConfig::SERIALIZE_NONE
     ]
 ];
