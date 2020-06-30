@@ -36,11 +36,11 @@ class Order extends ApiBase
                 $redis->decr("stock");
                 //TODO::用户是否已有订单
                 //TODO::保存订单
-//                $orderInfoModel = new OrderInfoModel();
-//                $miaoshaOrderModel = new MiaoshaOrderModel();
-//                $oid = $orderInfoModel->storage($input);
-//                $input ['order_id'] = $oid;
-//                $miaoshaOrderModel->storage($input);
+                $orderInfoModel = new OrderInfoModel();
+                $miaoshaOrderModel = new MiaoshaOrderModel();
+                $oid = $orderInfoModel->storage($input);
+                $input ['order_id'] = $oid;
+                $miaoshaOrderModel->storage($input);
                 $this->writeJson(1, null, 'ok');
             }
         } catch (\Throwable  $e) {
