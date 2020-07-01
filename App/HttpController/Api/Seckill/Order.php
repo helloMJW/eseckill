@@ -10,9 +10,19 @@ use App\Model\Seckill\MiaoshaOrderModel;
 use App\Model\Shop\OrderInfoModel;
 use EasySwoole\ORM\DbManager;
 
+/**
+ * 秒杀生成订单
+ * Class Order
+ * @package App\HttpController\Api\Seckill
+ */
 class Order extends ApiBase
 {
     /**
+     * 规则说明
+     * 1. 到达指定时间开始秒杀(倒计时)
+     * 2. 一个用户只能秒杀一个
+     * 3. 秒杀成功后用户需要在15分钟内付款完毕 否则回到秒杀商品中
+     *
      * 功能流程
      * 1. 用户登录 进入秒杀页面
      * 2. 点击秒杀按钮(秒杀成功 或 等待中 或 未付款还有机会)
@@ -32,29 +42,17 @@ class Order extends ApiBase
      */
 
     public function index() {
-//        $id = $this->input('id');
+
         $input = $this->request()->getRequestParam();
-
-        //TODO::验证活动状态
-
-        //TODO::验证库存
         $redis = \EasySwoole\Pool\Manager::getInstance()->get('redis')->getObj();
-        //DbManager::getInstance()->startTransaction();
         try{
-
-//            $model = new MiaoshaGoodsModel();
-//            $model->updateStock($input ['goods_id']);
-//
-//            $stock = $model->getStock($input ['goods_id']);
             $stock = $redis->get("stock");
             if($stock <= 0) {
                 $this->writeJson(0, null, '库存不足');
-                 //throw new \Exception('库存不足');
                 return false;
             } else {
                 $redis->decr("stock");
-                //TODO::用户是否已有订单
-                //TODO::保存订单
+
                 $orderInfoModel = new OrderInfoModel();
                 $miaoshaOrderModel = new MiaoshaOrderModel();
                 $oid = $orderInfoModel->storage($input);
@@ -63,13 +61,9 @@ class Order extends ApiBase
                 $this->writeJson(1, null, 'ok');
             }
         } catch (\Throwable  $e) {
-//            var_dump($e->getMessage());
-            //DbManager::getInstance()->rollback();
+
         } finally {
-
             \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redis);
-
-            //DbManager::getInstance()->commit();
         }
     }
 }
