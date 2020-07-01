@@ -12,6 +12,25 @@ use EasySwoole\ORM\DbManager;
 
 class Order extends ApiBase
 {
+    /**
+     * 功能流程
+     * 1. 用户登录 进入秒杀页面
+     * 2. 点击秒杀按钮(秒杀成功 或 等待中 或 未付款还有机会)
+     * 3. 接收秒杀成功短信(邮件) 填写收货地址 付款 等待收货
+     *
+     *
+     * 系统流程
+     * 1. 验证用户是否登录
+     * 2. 用户是否正常用户(非机器刷单)
+     * 3. 限流器
+     * 4. 校验库存
+     * 5. 更新库存 生成订单
+     * 6. 接收付款 完结订单
+     *
+     * @return bool|void
+     * @throws \Throwable
+     */
+
     public function index() {
 //        $id = $this->input('id');
         $input = $this->request()->getRequestParam();

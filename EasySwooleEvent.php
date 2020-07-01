@@ -17,6 +17,7 @@ use EasySwoole\ORM\Db\Connection;
 use EasySwoole\ORM\DbManager;
 use EasySwoole\Tracker\Point;
 use EasySwoole\Tracker\PointContext;
+use EasySwoole\AtomicLimit\AtomicLimit;
 
 use App\Ioc\Log;
 use App\Queue\TrackerQueue;
@@ -31,7 +32,7 @@ class   EasySwooleEvent implements Event
         // TODO: Implement initialize() method.
         date_default_timezone_set('Asia/Shanghai');
 
-        //Di::getInstance()->set(SysConst::TRIGGER_HANDLER, Log::class);
+
     }
 
     public static function mainServerCreate(EventRegister $register)
@@ -62,9 +63,11 @@ class   EasySwooleEvent implements Event
          // \EasySwoole\Component\Process\Manager::getInstance()->addProcess(new ProducerProcess());
 
         // 消费者
-         \EasySwoole\Component\Process\Manager::getInstance()->addProcess(new TrackerConsumer());
+         // \EasySwoole\Component\Process\Manager::getInstance()->addProcess(new TrackerConsumer());
 
-
+        AtomicLimit::getInstance()->addItem('default')->setMax(200);
+        AtomicLimit::getInstance()->addItem('api')->setMax(2);
+        AtomicLimit::getInstance()->enableProcessAutoRestore(ServerManager::getInstance()->getSwooleServer(),10*1000);
 
     }
 
@@ -76,6 +79,11 @@ class   EasySwooleEvent implements Event
             'uri'=>$request->getUri()->__toString(),
             'get'=>$request->getQueryParams()
         ]);
+
+//        if(!AtomicLimit::isAllow('api')) {
+//            $response->write(json_encode(array('code' => 400, 'result' => null, 'msg' => 'api refuse')));
+//            return false;
+//        }
 
         return true;
     }
