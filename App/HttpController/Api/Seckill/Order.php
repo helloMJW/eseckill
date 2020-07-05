@@ -44,26 +44,21 @@ class Order extends ApiBase
     public function index() {
 
         $input = $this->request()->getRequestParam();
-        $redis = \EasySwoole\Pool\Manager::getInstance()->get('redis')->getObj();
-        try{
-            $stock = $redis->get("stock");
-            if($stock <= 0) {
-                $this->writeJson(0, null, '库存不足');
-                return false;
-            } else {
-                $redis->decr("stock");
 
-                $orderInfoModel = new OrderInfoModel();
-                $miaoshaOrderModel = new MiaoshaOrderModel();
-                $oid = $orderInfoModel->storage($input);
-                $input ['order_id'] = $oid;
-                $miaoshaOrderModel->storage($input);
-                $this->writeJson(1, null, 'ok');
-            }
-        } catch (\Throwable  $e) {
+        $miaoshaGoodsModel = new MiaoshaGoodsModel();
+        $stock = $miaoshaGoodsModel->getStock($input ['id']);
 
-        } finally {
-            \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redis);
+        if($stock <= 0) {
+            $this->writeJson(0, null, '库存不足');
+            return false;
+        } else {
+            $orderInfoModel = new OrderInfoModel();
+            $miaoshaOrderModel = new MiaoshaOrderModel();
+            $oid = $orderInfoModel->storage($input);
+            $input ['order_id'] = $oid;
+            $miaoshaOrderModel->storage($input);
+            $this->writeJson(1, null, 'ok');
         }
+
     }
 }

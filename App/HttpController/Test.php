@@ -10,6 +10,9 @@ use EasySwoole\AtomicLimit\AtomicLimit;
 use EasySwoole\Component\Di;
 use EasySwoole\Log\LoggerInterface;
 
+// 上下文管理器
+use EasySwoole\Component\Context\ContextManager;
+
 // 邮件
 use EasySwoole\Smtp\Mailer;
 use EasySwoole\Smtp\MailerConfig;
@@ -19,7 +22,9 @@ use EasySwoole\Smtp\Message\Attach;
 class Test extends Controller
 {
     public function index(){
-        $this->writeJson(200, null, 1);
+        $cid = ContextManager::getInstance()->getCid();
+        var_dump($cid);
+//        $this->writeJson(200, null, 1);
     }
 
     public function atomic() {
@@ -59,4 +64,6 @@ class Test extends Controller
         $mailer = new Mailer($config);
         $mailer->sendTo('xxx@qq.com', $mimeBean);
     }
+
+
 }

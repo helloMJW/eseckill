@@ -12,9 +12,26 @@
 - [ ] 秒杀订单
 - [ ] 发送邮件
 
+### 秒杀版本
+
+- [ ] MySQL版本 mysql
+- [ ] 事务锁版本 transaction
+- [ ] 文件锁版本 file
+- [ ] redis版本 redis 
+- [ ] 限流版本 limit
+- [ ] 消息队列版本 queue
+- [ ] 分布式版本 dispersed
+- [ ] 分布式集群版本 colony
+
 ### 文档说明
 
 [mysql](./Docs/mysql)
+
+#### 接口
+
+- [ ] 用户登录
+- [ ] 商品详情
+- [ ] 秒杀商品
 
 
 ### 参考资料
