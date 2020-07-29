@@ -46,7 +46,7 @@ class Order extends ApiBase
         $input = $this->request()->getRequestParam();
 
         $miaoshaGoodsModel = new MiaoshaGoodsModel();
-        $stock = $miaoshaGoodsModel->getStock($input ['id']);
+        $stock = $miaoshaGoodsModel->getStock($input ['goods_id']);
 
         if($stock <= 0) {
             $this->writeJson(0, null, '库存不足');

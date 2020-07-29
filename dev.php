@@ -23,7 +23,7 @@ return [
     'TEMP_DIR' => null,
     'LOG_DIR' => null,
     'MYSQL' => [
-        'host'          => '192.168.3.51',
+        'host'          => 'mysql',
         'port'          => 3306,
         'user'          => 'root',
         'password'      => 'Root@qwe826',
