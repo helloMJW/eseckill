@@ -14,7 +14,7 @@
 
 ### 秒杀版本
 
-- [ ] MySQL版本 mysql
+- [x] MySQL版本 mysql
 - [ ] 事务锁版本 transaction
 - [ ] 文件锁版本 file
 - [ ] redis版本 redis 
@@ -32,6 +32,10 @@
 - [ ] 用户登录
 - [ ] 商品详情
 - [ ] 秒杀商品
+
+### 测试
+
+`./vendor/bin/co-phpunit Test`
 
 
 ### 参考资料

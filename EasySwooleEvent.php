@@ -108,7 +108,7 @@ class   EasySwooleEvent implements Event
 //        $res = $trackerPointModel->storage($tracker);
 
 //        var_dump($tracker);
-        $trackerQueue = new TrackerQueue();
-        $trackerQueue->main($tracker);
+//        $trackerQueue = new TrackerQueue();
+//        $trackerQueue->main($tracker);
     }
 }

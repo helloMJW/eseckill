@@ -44,14 +44,15 @@ class Order extends ApiBase
     public function index() {
 
         $input = $this->request()->getRequestParam();
-
+        $goodsId = $input ['goods_id'];
         $miaoshaGoodsModel = new MiaoshaGoodsModel();
-        $stock = $miaoshaGoodsModel->getStock($input ['goods_id']);
+        $stock = $miaoshaGoodsModel->getStock($goodsId);
 
         if($stock <= 0) {
             $this->writeJson(0, null, '库存不足');
             return false;
         } else {
+            $miaoshaGoodsModel->updateStock($goodsId);
             $orderInfoModel = new OrderInfoModel();
             $miaoshaOrderModel = new MiaoshaOrderModel();
             $oid = $orderInfoModel->storage($input);

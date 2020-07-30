@@ -26,7 +26,7 @@ return [
         'host'          => 'mysql',
         'port'          => 3306,
         'user'          => 'root',
-        'password'      => 'Root@qwe826',
+        'password'      => 'root',
         'database'      => 'eseckill',
         'timeout'       => 5,
         'charset'       => 'utf8mb4',
