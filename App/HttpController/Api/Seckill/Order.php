@@ -9,6 +9,7 @@ use App\Model\Seckill\MiaoshaGoodsModel;
 use App\Model\Seckill\MiaoshaOrderModel;
 use App\Model\Shop\OrderInfoModel;
 use EasySwoole\ORM\DbManager;
+use phpDocumentor\Reflection\DocBlock\Tags\Throws;
 
 /**
  * 秒杀生成订单
@@ -45,21 +46,39 @@ class Order extends ApiBase
 
         $input = $this->request()->getRequestParam();
         $goodsId = $input ['goods_id'];
-        $miaoshaGoodsModel = new MiaoshaGoodsModel();
-        $stock = $miaoshaGoodsModel->getStock($goodsId);
 
-        if($stock <= 0) {
-            $this->writeJson(0, null, '库存不足');
-            return false;
-        } else {
+        try{
+            //开启事务
+            DbManager::getInstance()->startTransaction();
+            $miaoshaGoodsModel = new MiaoshaGoodsModel();
             $miaoshaGoodsModel->updateStock($goodsId);
-            $orderInfoModel = new OrderInfoModel();
-            $miaoshaOrderModel = new MiaoshaOrderModel();
-            $oid = $orderInfoModel->storage($input);
-            $input ['order_id'] = $oid;
-            $miaoshaOrderModel->storage($input);
-            $this->writeJson(1, null, 'ok');
+            $stock = $miaoshaGoodsModel->getStock($goodsId);
+
+            if($stock < 0) {
+                $this->writeJson(0, null, '库存不足');
+                throw new \Exception('库存不足');
+                return false;
+            } else {
+
+                $orderInfoModel = new OrderInfoModel();
+                $miaoshaOrderModel = new MiaoshaOrderModel();
+                $oid = $orderInfoModel->storage($input);
+                $input ['order_id'] = $oid;
+                $miaoshaOrderModel->storage($input);
+                $this->writeJson(1, null, 'ok');
+            }
+
+        } catch(\Throwable  $e){
+            //回滚事务
+            DbManager::getInstance()->rollback();
+        } finally {
+            //提交事务
+            DbManager::getInstance()->commit();
         }
+
+
+
+
 
     }
 }
