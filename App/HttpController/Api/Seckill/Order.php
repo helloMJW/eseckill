@@ -10,7 +10,8 @@ use App\Model\Seckill\MiaoshaOrderModel;
 use App\Model\Shop\OrderInfoModel;
 use EasySwoole\ORM\DbManager;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws;
-
+use Swoole\Coroutine;
+use EasySwoole\EasySwoole\Logger;
 /**
  * 秒杀生成订单
  * Class Order
@@ -46,19 +47,56 @@ class Order extends ApiBase
 
         $input = $this->request()->getRequestParam();
         $goodsId = $input ['goods_id'];
+        $miaoshaGoodsModel = new MiaoshaGoodsModel();
 
+        $redisObj = \EasySwoole\Pool\Manager::getInstance()->get('redis')->getObj();
+        $stockKey = "goods:id:" . $goodsId;
+        $stockKeySign = "goods:stock:id:" . $goodsId;
+        $cid = Coroutine::getCid(); // 如果不是协程环境返回-1
+
+//        echo $cid . PHP_EOL;
+//        echo PHP_INT_MAX;
+
+        // goods:id:1 = 100;
+        if(!$redisObj->exists($stockKey)) {
+            $stock = $miaoshaGoodsModel->getStock($goodsId);
+            $redisObj->set($stockKey, $stock);
+            $redisObj->set($stockKeySign, 1);
+        }
+
+        if(!$redisObj->get($stockKeySign)) {
+            $this->writeJson(0, null, '库存不足');
+            \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redisObj);
+            return false;
+        }
+
+        $stock = $redisObj->decr($stockKey);
+
+        $log = 'cid:' . $cid . ' stock:' . $stock . ' time:' . time();
+
+        Logger::getInstance()->log($log,Logger::LOG_LEVEL_INFO,'DEBUG');//记录info级别日志//例子后面2个参数默认值
+
+
+        if($stock < 0) {
+            $redisObj->set($stockKeySign, 0);
+            $this->writeJson(0, null, '库存不足');
+            \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redisObj);
+            return false;
+        }
+
+        \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redisObj);
         try{
             //开启事务
             DbManager::getInstance()->startTransaction();
-            $miaoshaGoodsModel = new MiaoshaGoodsModel();
-            $miaoshaGoodsModel->updateStock($goodsId);
-            $stock = $miaoshaGoodsModel->getStock($goodsId);
 
-            if($stock < 0) {
-                $this->writeJson(0, null, '库存不足');
-                throw new \Exception('库存不足');
-                return false;
-            } else {
+//            $miaoshaGoodsModel->updateStock($goodsId);
+//            $stock = $miaoshaGoodsModel->getStock($goodsId);
+
+//            if($stock < 0) {
+//                $this->writeJson(0, null, '库存不足');
+//                throw new \Exception('库存不足');
+//                return false;
+//            } else {
 
                 $orderInfoModel = new OrderInfoModel();
                 $miaoshaOrderModel = new MiaoshaOrderModel();
@@ -66,7 +104,7 @@ class Order extends ApiBase
                 $input ['order_id'] = $oid;
                 $miaoshaOrderModel->storage($input);
                 $this->writeJson(1, null, 'ok');
-            }
+//            }
 
         } catch(\Throwable  $e){
             //回滚事务
