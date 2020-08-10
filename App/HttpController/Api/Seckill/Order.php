@@ -47,7 +47,13 @@ class Order extends ApiBase
 
         $input = $this->request()->getRequestParam();
         $goodsId = $input ['goods_id'];
-        $miaoshaGoodsModel = new MiaoshaGoodsModel();
+        try {
+            $miaoshaGoodsModel = new MiaoshaGoodsModel();
+        }catch (\Exception $e) {
+            var_dump($e->getMessage());
+        }
+
+
 
         $redisObj = \EasySwoole\Pool\Manager::getInstance()->get('redis')->getObj();
         $stockKey = "goods:id:" . $goodsId;
@@ -59,6 +65,7 @@ class Order extends ApiBase
 
         // goods:id:1 = 100;
         if(!$redisObj->exists($stockKey)) {
+//            $miaoshaGoodsModel = new MiaoshaGoodsModel();
             $stock = $miaoshaGoodsModel->getStock($goodsId);
             $redisObj->set($stockKey, $stock);
             $redisObj->set($stockKeySign, 1);
@@ -83,7 +90,7 @@ class Order extends ApiBase
             \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redisObj);
             return false;
         }
-
+//        $miaoshaGoodsModel = new MiaoshaGoodsModel();
         \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redisObj);
         try{
             //开启事务
