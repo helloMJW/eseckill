@@ -47,7 +47,7 @@ class Order extends ApiBase
 
         $input = $this->request()->getRequestParam();
         $goodsId = $input ['goods_id'];
-        $mark = $input ['mark'] ?? 'none';
+        $mark = $input ['mark'] ? $input ['mark'] : 'none';
         
         // 接收请求
         $log = 'mark:' . $mark . 'goods_id:'. $goodsId . ' time' . microtime();
