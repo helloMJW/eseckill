@@ -47,6 +47,13 @@ class Order extends ApiBase
 
         $input = $this->request()->getRequestParam();
         $goodsId = $input ['goods_id'];
+        $mark = $input ['mark'] ?? 'none';
+        
+        // 接收请求
+        $log = 'mark:' . $mark . 'goods_id:'. $goodsId . ' time' . microtime();
+        Logger::getInstance()->log($log,Logger::LOG_LEVEL_INFO,'DEBUG');
+        
+        
         try {
             $miaoshaGoodsModel = new MiaoshaGoodsModel();
         }catch (\Exception $e) {
@@ -79,9 +86,9 @@ class Order extends ApiBase
 
         $stock = $redisObj->decr($stockKey);
 
-        $log = 'cid:' . $cid . ' stock:' . $stock . ' time:' . time();
-
-        Logger::getInstance()->log($log,Logger::LOG_LEVEL_INFO,'DEBUG');//记录info级别日志//例子后面2个参数默认值
+//        $log = 'cid:' . $cid . ' stock:' . $stock . ' time:' . time();
+//
+//        Logger::getInstance()->log($log,Logger::LOG_LEVEL_INFO,'DEBUG');//记录info级别日志//例子后面2个参数默认值
 
 
         if($stock < 0) {
