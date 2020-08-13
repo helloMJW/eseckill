@@ -31,7 +31,8 @@ return [
         'timeout'       => 5,
         'charset'       => 'utf8mb4',
         'POOL_MAX_NUM'  => 20,
-        'POOL_TIME_OUT' => 1
+        'POOL_TIME_OUT' => 1,
+        #'autoPing' => 2,
     ],
     'REDIS' => [
         'host'      => 'redis',

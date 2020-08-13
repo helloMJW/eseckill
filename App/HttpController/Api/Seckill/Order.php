@@ -56,6 +56,7 @@ class Order extends ApiBase
         
         try {
             $miaoshaGoodsModel = new MiaoshaGoodsModel();
+            $miaoshaGoodsModel->getStock($goodsId);
         }catch (\Exception $e) {
             var_dump($e->getMessage());
         }

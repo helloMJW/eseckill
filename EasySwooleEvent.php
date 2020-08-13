@@ -50,7 +50,10 @@ class   EasySwooleEvent implements Event
 
         //MYSQL
         $config = new \EasySwoole\ORM\Db\Config(Config::getInstance()->getConf('MYSQL'));
-        DbManager::getInstance()->addConnection(new Connection($config));
+        //$config->setMaxObjectNum(30);
+        $mysqlPool = new Connection($config);
+//        $res = $mysqlPool->getClientPool()->status();
+        DbManager::getInstance()->addConnection($mysqlPool);
 
         //REDIS
         $config = new \EasySwoole\Pool\Config();
@@ -68,6 +71,21 @@ class   EasySwooleEvent implements Event
         AtomicLimit::getInstance()->addItem('default')->setMax(200);
         AtomicLimit::getInstance()->addItem('api')->setMax(2);
         AtomicLimit::getInstance()->enableProcessAutoRestore(ServerManager::getInstance()->getSwooleServer(),10*1000);
+
+        $register->add(EventRegister::onWorkerStart, function(\swoole_server $server, $workerId){
+
+            \EasySwoole\Component\Timer::getInstance()->loop(1 * 1000, function () {
+//                $server = new \swoole_server();
+//                $server = ServerManager::getInstance()->getSwooleServer();
+//                $workerId = $server->worker_id;
+                $mysqlPoolStatus = DbManager::getInstance()->getConnection()->getClientPool()->status();
+                $redisPoolStatus = \EasySwoole\Pool\Manager::getInstance()->get('redis')->status();
+//                var_dump($redisPoolStatus);
+//                var_dump($mysqlPoolStatus);
+//                var_dump(json_encode($mysqlPoolStatus));
+                Logger::getInstance()->console("mysql pool " . json_encode($mysqlPoolStatus)  , false, 'DEBUG');
+            });
+        });
 
     }
 
