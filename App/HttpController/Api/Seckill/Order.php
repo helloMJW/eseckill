@@ -7,7 +7,9 @@ namespace App\HttpController\Api\Seckill;
 use App\HttpController\Api\ApiBase;
 use App\Model\Seckill\MiaoshaGoodsModel;
 use App\Model\Seckill\MiaoshaOrderModel;
+use App\Model\Shop\GoodsModel;
 use App\Model\Shop\OrderInfoModel;
+use App\Producer\OrderProducer;
 use EasySwoole\ORM\DbManager;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws;
 use Swoole\Coroutine;
@@ -47,91 +49,58 @@ class Order extends ApiBase
 
         $input = $this->request()->getRequestParam();
         $goodsId = $input ['goods_id'];
-        $mark = $input ['mark'] ? $input ['mark'] : 'none';
-        
-        // 接收请求
-        $log = 'mark:' . $mark . 'goods_id:'. $goodsId . ' time' . microtime();
-        Logger::getInstance()->log($log,Logger::LOG_LEVEL_INFO,'DEBUG');
-        
-        
-        try {
-            $miaoshaGoodsModel = new MiaoshaGoodsModel();
-            $miaoshaGoodsModel->getStock($goodsId);
-        }catch (\Exception $e) {
-            var_dump($e->getMessage());
-        }
 
+
+        // 接收请求
+        $log = 'goods_id:'. $goodsId . ' time' . microtime();
+        Logger::getInstance()->log($log,Logger::LOG_LEVEL_INFO,'DEBUG');
 
 
         $redisObj = \EasySwoole\Pool\Manager::getInstance()->get('redis')->getObj();
         $stockKey = "goods:id:" . $goodsId;
         $stockKeySign = "goods:stock:id:" . $goodsId;
-        $cid = Coroutine::getCid(); // 如果不是协程环境返回-1
 
-//        echo $cid . PHP_EOL;
-//        echo PHP_INT_MAX;
-
-        // goods:id:1 = 100;
-        if(!$redisObj->exists($stockKey)) {
-//            $miaoshaGoodsModel = new MiaoshaGoodsModel();
-            $stock = $miaoshaGoodsModel->getStock($goodsId);
-            $redisObj->set($stockKey, $stock);
-            $redisObj->set($stockKeySign, 1);
-        }
 
         if(!$redisObj->get($stockKeySign)) {
-            $this->writeJson(0, null, '库存不足');
+            $this->writeJson(0, null, '参数错误');
             \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redisObj);
             return false;
         }
-
+        //TODO::增加分布式锁处理
         $stock = $redisObj->decr($stockKey);
-
-//        $log = 'cid:' . $cid . ' stock:' . $stock . ' time:' . time();
-//
-//        Logger::getInstance()->log($log,Logger::LOG_LEVEL_INFO,'DEBUG');//记录info级别日志//例子后面2个参数默认值
-
-
         if($stock < 0) {
             $redisObj->set($stockKeySign, 0);
             $this->writeJson(0, null, '库存不足');
             \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redisObj);
             return false;
         }
-//        $miaoshaGoodsModel = new MiaoshaGoodsModel();
         \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redisObj);
-        try{
-            //开启事务
-            DbManager::getInstance()->startTransaction();
+        //TODO::消息队列处理-生产者
+        /**
+         * 消息队列消费的时候处理
+         * 获取goods_id详细信息
+         * 获取address_id详细信息
+         * 获取uid详细信息
+         * 插入mysql
+         * 通知用户短信、邮箱、APP
+         */
+        $orderProducer = new OrderProducer();
+        $orderProducer->main(['goodsId' => $goodsId, 'uid' => time()]);
 
-//            $miaoshaGoodsModel->updateStock($goodsId);
-//            $stock = $miaoshaGoodsModel->getStock($goodsId);
+    }
 
-//            if($stock < 0) {
-//                $this->writeJson(0, null, '库存不足');
-//                throw new \Exception('库存不足');
-//                return false;
-//            } else {
+    public function getRedis()
+    {
+        $redisObj = \EasySwoole\Pool\Manager::getInstance()->get('redis')->getObj();
+        \EasySwoole\Pool\Manager::getInstance()->get('redis')->recycleObj($redisObj);
+        $this->writeJson(0, null, 'success ok');
+    }
 
-                $orderInfoModel = new OrderInfoModel();
-                $miaoshaOrderModel = new MiaoshaOrderModel();
-                $oid = $orderInfoModel->storage($input);
-                $input ['order_id'] = $oid;
-                $miaoshaOrderModel->storage($input);
-                $this->writeJson(1, null, 'ok');
-//            }
-
-        } catch(\Throwable  $e){
-            //回滚事务
-            DbManager::getInstance()->rollback();
-        } finally {
-            //提交事务
-            DbManager::getInstance()->commit();
-        }
-
-
-
-
-
+    /**
+     * 直接返回
+     */
+    public function testHttp()
+    {
+        $this->writeJson(0, null, 'hello world');
     }
 }

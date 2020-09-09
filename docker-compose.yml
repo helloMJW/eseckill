@@ -1,0 +1,34 @@
+version: '3'
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+services:
+
+  ### Workspace Utilities ##################################
+  workspace:
+    image: registry.cn-shenzhen.aliyuncs.com/xdock/workspace:7.2-1.0.1
+    volumes:
+      - ./:/var/www
+    networks:
+      - frontend
+      - backend
+
+  ### PHP-FPM ##############################################
+  php-fpm:
+    image: registry.cn-shenzhen.aliyuncs.com/xdock/php-fpm:7.2-1.0.1
+    volumes:
+      - ./php7.2.ini:/usr/local/etc/php/php.ini
+      - ./:/var/www
+    expose:
+      - "9000"
+    ports:
+      - "9506:9501"
+    depends_on:
+      - workspace
+    networks:
+      - backend
+

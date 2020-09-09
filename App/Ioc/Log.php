@@ -24,7 +24,6 @@ class Log implements LoggerInterface
 
     function console(?string $msg,int $logLevel = self::LOG_LEVEL_INFO,string $category = 'debug')
     {
-        var_dump($msg);
         $this->logger->console($msg, $logLevel, $category);
     }
 }

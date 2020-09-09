@@ -36,6 +36,11 @@ class Index extends Controller
 
     }
 
+    public function article()
+    {
+
+    }
+
     protected function actionNotFound(?string $action)
     {
         $this->response()->withStatus(404);

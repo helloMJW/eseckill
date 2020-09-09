@@ -13,6 +13,7 @@ class OrderInfoModel extends AbstractModel
     protected $primaryKey = 'id';
 
     public function storage($data) {
+
         return self::create()->data($data, false)->save();
     }
 }

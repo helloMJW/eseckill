@@ -6,6 +6,7 @@ use App\Consumer\TrackerConsumer;
 use App\Model\Sys\TrackerPointModel;
 use App\Producer\Process as ProducerProcess;
 use App\Consumer\Process as ConsumerProcess;
+use App\Consumer\OrderConsumer;
 
 use App\Utility\CommonUtility;
 use EasySwoole\Component\Di;
@@ -62,30 +63,37 @@ class   EasySwooleEvent implements Event
 
         //KAFKA
 
+        \EasySwoole\Component\Process\Manager::getInstance()->addProcess(new OrderConsumer());
+
         // 生产者
-         // \EasySwoole\Component\Process\Manager::getInstance()->addProcess(new ProducerProcess());
-
+//        $processConfig= new \EasySwoole\Component\Process\Config();
+//        $processConfig->setProcessName('kafka');
+//        \EasySwoole\Component\Process\Manager::getInstance()->addProcess(new ProducerProcess());
+//        $processConfig1= new \EasySwoole\Component\Process\Config();
+//        $processConfig1->setProcessName('kafka2');
         // 消费者
-         // \EasySwoole\Component\Process\Manager::getInstance()->addProcess(new TrackerConsumer());
+//        \EasySwoole\Component\Process\Manager::getInstance()->addProcess(new ConsumerProcess());
 
-        AtomicLimit::getInstance()->addItem('default')->setMax(200);
-        AtomicLimit::getInstance()->addItem('api')->setMax(2);
-        AtomicLimit::getInstance()->enableProcessAutoRestore(ServerManager::getInstance()->getSwooleServer(),10*1000);
 
-        $register->add(EventRegister::onWorkerStart, function(\swoole_server $server, $workerId){
 
-            \EasySwoole\Component\Timer::getInstance()->loop(1 * 1000, function () {
-//                $server = new \swoole_server();
-//                $server = ServerManager::getInstance()->getSwooleServer();
-//                $workerId = $server->worker_id;
-                $mysqlPoolStatus = DbManager::getInstance()->getConnection()->getClientPool()->status();
-                $redisPoolStatus = \EasySwoole\Pool\Manager::getInstance()->get('redis')->status();
-//                var_dump($redisPoolStatus);
-//                var_dump($mysqlPoolStatus);
-//                var_dump(json_encode($mysqlPoolStatus));
-                Logger::getInstance()->console("mysql pool " . json_encode($mysqlPoolStatus)  , false, 'DEBUG');
-            });
-        });
+//         AtomicLimit::getInstance()->addItem('default')->setMax(200);
+//         AtomicLimit::getInstance()->addItem('api')->setMax(2);
+//         AtomicLimit::getInstance()->enableProcessAutoRestore(ServerManager::getInstance()->getSwooleServer(),10*1000);
+
+//         $register->add(EventRegister::onWorkerStart, function(\swoole_server $server, $workerId){
+
+//             \EasySwoole\Component\Timer::getInstance()->loop(1 * 1000, function () {
+// //                $server = new \swoole_server();
+// //                $server = ServerManager::getInstance()->getSwooleServer();
+// //                $workerId = $server->worker_id;
+//                 $mysqlPoolStatus = DbManager::getInstance()->getConnection()->getClientPool()->status();
+//                 $redisPoolStatus = \EasySwoole\Pool\Manager::getInstance()->get('redis')->status();
+// //                var_dump($redisPoolStatus);
+// //                var_dump($mysqlPoolStatus);
+// //                var_dump(json_encode($mysqlPoolStatus));
+//                 Logger::getInstance()->console("mysql pool " . json_encode($redisPoolStatus)  , false, 'DEBUG');
+//             });
+//         });
 
     }
 

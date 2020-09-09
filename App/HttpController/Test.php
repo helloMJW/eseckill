@@ -19,11 +19,68 @@ use EasySwoole\Smtp\MailerConfig;
 use EasySwoole\Smtp\Message\Html;
 use EasySwoole\Smtp\Message\Attach;
 
+//消息队列
+use Enqueue\RdKafka\RdKafkaConnectionFactory;
+use App\Producer\OrderProducer;
+
 class Test extends Controller
 {
     public function index(){
-        $cid = ContextManager::getInstance()->getCid();
-        var_dump($cid);
+
+
+        ## order queue kafka
+        $orderProducer = new OrderProducer();
+        $orderProducer->main(['uid' => 1, 'oid' => 100]);
+
+        ## kafka
+
+//        $connectionFactory = new RdKafkaConnectionFactory([
+//            'global' => [
+//                'group.id' => uniqid('', true),
+//                'metadata.broker.list' => '192.168.3.118:32772',
+//                'enable.auto.commit' => 'false',
+//            ],
+//            'topic' => [
+//                'auto.offset.reset' => 'beginning',
+//            ],
+//        ]);
+//
+//        $context = $connectionFactory->createContext();
+
+//        $message = $context->createMessage('Hello world!');
+//
+//        $fooTopic = $context->createQueue('hello');
+//
+//        $context->createProducer()->send($fooTopic, $message);
+
+//        $message = $context->createMessage('Hello world!');
+//
+//        $fooQueue = $context->createQueue('hello');
+//
+//        $context->createProducer()->send($fooQueue, $message);
+
+//        $fooQueue = $context->createQueue('hello');
+//
+//        $consumer = $context->createConsumer($fooQueue);
+//
+//        $message = $consumer->receive();
+//        var_dump($message);
+//        $consumer->acknowledge($message);
+//
+//        $this->writeJson(200, null, null);
+
+        # 读取文本输出
+        // $this->response()->write(file_get_contents(EASYSWOOLE_ROOT . '/phpinfo.html'));
+
+        ## 自定义进程
+
+//        $a = \EasySwoole\Component\Process\Manager::getInstance()->info();
+//        var_dump($a);
+
+
+        ## 上下文PID获取
+//        $cid = ContextManager::getInstance()->getCid();
+//        var_dump($cid);
 //        $this->writeJson(200, null, 1);
     }
 
@@ -64,6 +121,5 @@ class Test extends Controller
         $mailer = new Mailer($config);
         $mailer->sendTo('xxx@qq.com', $mimeBean);
     }
-
 
 }

@@ -23,10 +23,10 @@ return [
     'TEMP_DIR' => null,
     'LOG_DIR' => null,
     'MYSQL' => [
-        'host'          => 'mysql',
+        'host'          => '192.168.3.51',
         'port'          => 3306,
         'user'          => 'root',
-        'password'      => 'root',
+        'password'      => 'Root@qwe826',
         'database'      => 'eseckill',
         'timeout'       => 5,
         'charset'       => 'utf8mb4',
@@ -35,8 +35,8 @@ return [
         #'autoPing' => 2,
     ],
     'REDIS' => [
-        'host'      => 'redis',
-        'port'      => '6379',
+        'host'      => '192.168.3.51',
+        'port'      => '8379',
         'auth'      => '',
         'db'        => null,
         'serialize' => \EasySwoole\Redis\Config\RedisConfig::SERIALIZE_NONE
