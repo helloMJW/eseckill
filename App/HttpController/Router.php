@@ -29,5 +29,9 @@ class Router extends AbstractRouter
 //            return false;//不再往下请求,结束此次响应
 //        });
 
+        $routeCollector->post('/user/login', '/Api/Login/user');
+        $routeCollector->post('/user/register', '/Api/Register/user');
+
+        $routeCollector->get('/user/info', '/Api/User/User/info');
     }
 }

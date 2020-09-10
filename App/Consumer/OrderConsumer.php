@@ -17,7 +17,7 @@ class OrderConsumer extends AbstractProcess
             $connectionFactory = new RdKafkaConnectionFactory([
                 'global' => [
                     'group.id' => '5f575c3e8e0c48.97735624',
-                    'metadata.broker.list' => '192.168.3.118:32772',
+                    'metadata.broker.list' => '192.168.3.118:32768',
                     'enable.auto.commit' => 'false',
                 ],
                 'topic' => [

@@ -13,7 +13,7 @@ class OrderProducer
         $connectionFactory = new RdKafkaConnectionFactory([
             'global' => [
                 'group.id' => 'order',
-                'metadata.broker.list' => '192.168.3.118:32772',
+                'metadata.broker.list' => '192.168.3.118:32768',
                 'enable.auto.commit' => 'false',
             ],
             'topic' => [
